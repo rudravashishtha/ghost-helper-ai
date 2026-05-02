@@ -139,11 +139,11 @@
 @layer components {
     /* Dialog pattern — reusable shell for product dialogs */
     .dialog-overlay {
-        @apply fixed inset-0 z-50 bg-black/60 backdrop-blur-sm;
+        @apply fixed inset-0 z-60 bg-black/60 backdrop-blur-sm;
     }
 
     .dialog-content {
-        @apply bg-elevated border border-surface-border rounded-3xl shadow-2xl p-6 flex flex-col gap-4;
+        @apply z-60 bg-elevated border border-surface-border rounded-3xl shadow-2xl p-6 flex flex-col gap-4;
     }
 
     .dialog-title {

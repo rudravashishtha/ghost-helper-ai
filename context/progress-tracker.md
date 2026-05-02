@@ -30,3 +30,4 @@ Update this file whenever the current phase, active feature, or implementation s
 ## Session Notes
 
 - Add context needed to resume work in the next session.
+- Accessibility and layering follow-up for editor chrome: the project sidebar now toggles `aria-hidden` + `inert` when off-canvas, the navbar toggle now exposes `aria-expanded`/`aria-controls`, and dialog shell classes use `z-60` so modals stack above the sidebar.

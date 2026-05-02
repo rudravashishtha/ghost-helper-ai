@@ -7,11 +7,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 interface ProjectSidebarProps {
   isOpen: boolean
   onClose: () => void
+  sidebarId?: string
 }
 
-export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
+export function ProjectSidebar({ isOpen, onClose, sidebarId = "project-sidebar" }: ProjectSidebarProps) {
   return (
     <div
+      id={sidebarId}
+      aria-hidden={isOpen ? undefined : true}
+      inert={isOpen ? undefined : true}
       className={[
         "fixed top-0 left-0 z-50 h-full w-72 flex flex-col",
         "bg-surface border-r border-surface-border",
