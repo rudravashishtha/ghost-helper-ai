@@ -4,12 +4,13 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Feature 02: Editor Chrome — complete
+- Feature 03: Auth — complete
 
 ## Completed
 
 - Feature 01: Design System — shadcn/ui initialized (Tailwind v4), Button/Card/Dialog/Input/Tabs/Textarea/ScrollArea added, lucide-react installed, lib/utils.ts cn() helper created, globals.css updated with dark-only theme tokens.
 - Feature 02: Editor Chrome — components/editor/editor-navbar.tsx (toggle PanelLeftOpen/PanelLeftClose, three layout regions), components/editor/project-sidebar.tsx (floating overlay, Tabs with My Projects/Shared, New Project footer button), dialog styling pattern added to globals.css (@layer components: dialog-overlay, dialog-content, dialog-title, dialog-description, dialog-footer).
+- Feature 03: Auth — @clerk/ui installed, proxy.ts at root (Next.js 16 Node.js middleware), ClerkProvider wraps root layout with dark theme + CSS variable overrides, /sign-in and /sign-up two-panel pages, app/page.tsx redirects authenticated→/editor unauthenticated→/sign-in, UserButton added to editor navbar right section, app/editor/page.tsx + editor-shell.tsx created.
 
 ## In Progress
 
@@ -17,7 +18,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Feature 03 (TBD).
+- Feature 04 (TBD).
 
 ## Open Questions
 

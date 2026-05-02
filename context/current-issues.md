@@ -1,0 +1,1 @@
+When I login and get redirected to localhost:3000, the page is empty, not even sidebar shows up but if i refresh everything works fine.
