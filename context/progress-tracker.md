@@ -32,3 +32,4 @@ Update this file whenever the current phase, active feature, or implementation s
 
 - Add context needed to resume work in the next session.
 - Accessibility and layering follow-up for editor chrome: the project sidebar now toggles `aria-hidden` + `inert` when off-canvas, the navbar toggle now exposes `aria-expanded`/`aria-controls`, and dialog shell classes use `z-60` so modals stack above the sidebar.
+- Auth route protection hardening: `proxy.ts` now falls back to `/sign-in` and `/sign-up` when Clerk public route env vars are unset, preventing matcher failures such as `undefined(.*)` and redirect lockout on auth pages.
