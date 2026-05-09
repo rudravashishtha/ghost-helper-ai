@@ -46,7 +46,7 @@ function ProjectItem({ project, isOwned, isActive, onRename, onDelete }: Project
       </span>
 
       {isOwned && (
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
           <Button
             variant="ghost"
             size="icon-xs"
