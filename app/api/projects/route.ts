@@ -26,13 +26,25 @@ export async function POST(request: Request) {
       ? body.name.trim()
       : "Untitled Project";
   const id =
-    typeof body?.id === "string" && /^[a-z0-9-]{4,128}$/.test(body.id)
+    typeof body?.id === "string" &&
+    /^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){2,126}[a-z0-9]$/.test(body.id)
       ? body.id
       : undefined;
 
-  const project = await prisma.project.create({
-    data: { ...(id ? { id } : {}), ownerId: userId, name },
-  });
-
-  return NextResponse.json({ project }, { status: 201 });
+  try {
+    const project = await prisma.project.create({
+      data: { ...(id ? { id } : {}), ownerId: userId, name },
+    });
+    return NextResponse.json({ project }, { status: 201 });
+  } catch (err: unknown) {
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      (err as { code: string }).code === "P2002"
+    ) {
+      return NextResponse.json({ error: "ID already taken" }, { status: 409 });
+    }
+    throw err;
+  }
 }

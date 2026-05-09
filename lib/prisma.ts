@@ -10,7 +10,8 @@ function makePrismaClient(): PrismaClient {
     return new PrismaClient({ accelerateUrl: url }).$extends(withAccelerate()) as unknown as PrismaClient
   }
 
-  const adapter = new PrismaPg(new Pool({ connectionString: url, ssl: { rejectUnauthorized: true } }))
+  const ssl = process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : false
+  const adapter = new PrismaPg(new Pool({ connectionString: url, ssl }))
   return new PrismaClient({ adapter })
 }
 

@@ -63,17 +63,27 @@ export function useProjectActions() {
     if (!trimmedName || !slug) return;
 
     if (!createSuffix) return;
-    const roomId = `${slug}-${createSuffix}`;
     setLoading(true);
-    try {
+
+    async function attemptCreate(suffix: string): Promise<boolean> {
+      const roomId = `${slug}-${suffix}`;
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: trimmedName, id: roomId }),
       });
+      if (res.status === 409) return false;
       if (!res.ok) throw new Error("Failed to create project");
       closeDialog();
       router.push(`/editor/${roomId}`);
+      return true;
+    }
+
+    try {
+      const ok = await attemptCreate(createSuffix);
+      if (!ok) {
+        await attemptCreate(shortSuffix());
+      }
     } catch {
       setLoading(false);
     }
