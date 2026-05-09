@@ -6,9 +6,14 @@ import {
   Share2,
   BrainCircuit,
   LayoutTemplate,
+  Check,
+  Loader2,
+  AlertCircle,
+  Save,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import type { SaveStatus } from "@/hooks/use-canvas-autosave";
 
 interface EditorNavbarProps {
   isSidebarOpen: boolean;
@@ -19,6 +24,8 @@ interface EditorNavbarProps {
   isAIOpen?: boolean;
   onToggleAI?: () => void;
   onOpenTemplates?: () => void;
+  saveStatus?: SaveStatus;
+  onSave?: () => void;
 }
 
 export function EditorNavbar({
@@ -30,6 +37,8 @@ export function EditorNavbar({
   isAIOpen,
   onToggleAI,
   onOpenTemplates,
+  saveStatus,
+  onSave,
 }: EditorNavbarProps) {
   return (
     <header className="relative h-14 flex items-center px-4 glass-panel-deep border-b border-surface-border shrink-0 z-50">
@@ -70,6 +79,28 @@ export function EditorNavbar({
       <div className="flex-1" />
 
       <div className="flex items-center gap-2">
+        {onSave && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={saveStatus === "idle" || saveStatus === "error" ? onSave : undefined}
+            disabled={saveStatus === "saving"}
+            className={[
+              "h-8 gap-1.5 text-xs font-medium transition-colors",
+              saveStatus === "saved"
+                ? "text-copy-muted cursor-default pointer-events-none"
+                : saveStatus === "error"
+                  ? "text-red-400 hover:text-red-300"
+                  : "text-copy-muted hover:text-copy-primary",
+            ].join(" ")}
+          >
+            {saveStatus === "saving" && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            {saveStatus === "saved" && <Check className="h-3.5 w-3.5" />}
+            {saveStatus === "error" && <AlertCircle className="h-3.5 w-3.5" />}
+            {(!saveStatus || saveStatus === "idle") && <Save className="h-3.5 w-3.5" />}
+            {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved" : saveStatus === "error" ? "Save failed" : "Save"}
+          </Button>
+        )}
         {onOpenTemplates && (
           <Button
             variant="ghost"

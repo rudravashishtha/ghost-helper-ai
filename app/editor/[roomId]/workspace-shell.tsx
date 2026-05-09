@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { BrainCircuit } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import {
@@ -14,8 +14,10 @@ import { DeleteProjectDialog } from "@/components/editor/dialogs/delete-project-
 import { useProjectActions } from "@/hooks/use-project-actions";
 import { CanvasWrapper } from "@/components/editor/canvas/canvas-wrapper";
 import { StarterTemplatesModal } from "@/components/editor/starter-templates-modal";
+import { AiSidebar } from "@/components/editor/ai-sidebar";
 import type { CanvasTemplate } from "@/components/editor/starter-templates";
 import type { Project } from "@/lib/types";
+import type { SaveStatus } from "@/hooks/use-canvas-autosave";
 
 interface WorkspaceShellProps {
   project: Project;
@@ -31,9 +33,24 @@ export function WorkspaceShell({
   isOwner,
 }: WorkspaceShellProps) {
   const shareDialogRef = useRef<ShareDialogHandle>(null);
+  const saveFnRef = useRef<(() => void) | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+
+  const onNavigate = useCallback(
+    (roomId: string) => {
+      if (roomId === project.id) {
+        setSidebarOpen(false);
+        return;
+      }
+      router.push(`/editor/${roomId}`);
+    },
+    [router, project.id],
+  );
+
   const [aiOpen, setAiOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [shareLoadError, setShareLoadError] = useState<string | null>(null);
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [templateToImport, setTemplateToImport] = useState<CanvasTemplate | null>(null);
@@ -73,6 +90,8 @@ export function WorkspaceShell({
         onShare={handleShareOpen}
         isAIOpen={aiOpen}
         onToggleAI={() => setAiOpen((v) => !v)}
+        saveStatus={saveStatus}
+        onSave={() => saveFnRef.current?.()}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -85,6 +104,7 @@ export function WorkspaceShell({
           onNewProject={openCreate}
           onRenameProject={openRename}
           onDeleteProject={openDelete}
+          onNavigate={onNavigate}
         />
 
         <main className="flex-1 overflow-hidden relative bg-base">
@@ -92,42 +112,13 @@ export function WorkspaceShell({
             roomId={project.id}
             templateToImport={templateToImport}
             onTemplateImported={() => setTemplateToImport(null)}
+            onSaveStatusChange={setSaveStatus}
+            onSaveReady={(fn) => { saveFnRef.current = fn; }}
           />
         </main>
       </div>
 
-      {aiOpen && (
-        <aside className="fixed z-40 flex flex-col top-16 right-2 h-[calc(100vh-3.5rem-16px)] w-80 bg-elevated/95 backdrop-blur-2xl border border-surface-border/60 rounded-2xl overflow-hidden shadow-[0_8px_40px_-4px_rgba(0,0,0,0.8),0_2px_12px_-2px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.04)]">
-          <div className="flex items-center justify-between h-14 px-5 border-b border-surface-border shrink-0 bg-surface/30">
-            <div className="flex items-center gap-2">
-              <BrainCircuit className="h-4 w-4 text-ai-text" />
-              <span className="text-sm font-semibold tracking-wide text-copy-primary">
-                AI Assistant
-              </span>
-            </div>
-            <div className="flex gap-1.5">
-              <div className="h-1 w-1 rounded-full bg-ai/40" />
-              <div className="h-1 w-1 rounded-full bg-ai/40" />
-            </div>
-          </div>
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center gap-6 relative">
-            <div className="absolute inset-0 bg-linear-to-b from-ai/5 to-transparent pointer-events-none" />
-
-            <div className="relative h-20 w-20 rounded-full glass-panel-deep border border-ai/20 flex items-center justify-center glow-celestial mb-2">
-              <BrainCircuit className="h-8 w-8 text-ai-text opacity-50" />
-            </div>
-
-            <div className="relative z-10 space-y-2">
-              <p className="text-sm text-copy-muted max-w-50 leading-relaxed">
-                System Offline
-              </p>
-              <p className="text-sm text-copy-muted max-w-50 leading-relaxed">
-                The neural generation features are currently in standby mode.
-              </p>
-            </div>
-          </div>
-        </aside>
-      )}
+      <AiSidebar isOpen={aiOpen} onClose={() => setAiOpen(false)} />
 
       <StarterTemplatesModal
         open={templatesOpen}
