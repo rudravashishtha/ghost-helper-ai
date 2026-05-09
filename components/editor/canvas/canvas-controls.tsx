@@ -37,6 +37,7 @@ export function CanvasControls({
         className={btn}
         onClick={() => instance.zoomOut({ duration: 200 })}
         title="Zoom out (-)"
+        aria-label="Zoom out"
       >
         <ZoomOut className="w-3.5 h-3.5 text-[#a0a0b8]" />
       </button>
@@ -44,6 +45,7 @@ export function CanvasControls({
         className={btn}
         onClick={() => instance.fitView({ duration: 300 })}
         title="Fit view"
+        aria-label="Fit view"
       >
         <Maximize2 className="w-3.5 h-3.5 text-[#a0a0b8]" />
       </button>
@@ -51,6 +53,7 @@ export function CanvasControls({
         className={btn}
         onClick={() => instance.zoomIn({ duration: 200 })}
         title="Zoom in (+)"
+        aria-label="Zoom in"
       >
         <ZoomIn className="w-3.5 h-3.5 text-[#a0a0b8]" />
       </button>
@@ -65,6 +68,7 @@ export function CanvasControls({
         onClick={undo}
         disabled={!canUndo}
         title="Undo (Cmd+Z)"
+        aria-label="Undo"
       >
         <Undo2 className="w-3.5 h-3.5 text-[#a0a0b8]" />
       </button>
@@ -73,6 +77,7 @@ export function CanvasControls({
         onClick={redo}
         disabled={!canRedo}
         title="Redo (Cmd+Shift+Z)"
+        aria-label="Redo"
       >
         <Redo2 className="w-3.5 h-3.5 text-[#a0a0b8]" />
       </button>

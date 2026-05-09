@@ -117,6 +117,7 @@ export function ShapePanel() {
           draggable
           onDragStart={(e) => handleDragStart(e, config)}
           title={config.label}
+          aria-label={config.label}
           className="h-9 w-9 flex items-center justify-center rounded-full text-copy-secondary hover:text-brand hover:bg-accent-dim transition-colors cursor-grab active:cursor-grabbing"
         >
           <config.icon className="h-4 w-4" />
