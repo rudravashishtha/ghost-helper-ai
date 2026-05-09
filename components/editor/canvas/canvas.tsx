@@ -15,7 +15,7 @@ import {
   type OnEdgesChange,
 } from "@xyflow/react";
 import { useLiveblocksFlow, Cursors } from "@liveblocks/react-flow";
-import { useUndo, useRedo, useCanUndo, useCanRedo } from "@liveblocks/react";
+import { useUndo, useRedo, useCanUndo, useCanRedo, useUpdateMyPresence } from "@liveblocks/react";
 import "@xyflow/react/dist/style.css";
 import "@liveblocks/react-ui/styles.css";
 import "@liveblocks/react-flow/styles.css";
@@ -24,6 +24,8 @@ import { CanvasEdgeRenderer } from "./canvas-edge";
 import { CanvasControls } from "./canvas-controls";
 import { ShapePanel } from "./shape-panel";
 import { CanvasContext, useCanvas } from "./canvas-context";
+import { CanvasCursor } from "./canvas-cursor";
+import { PresenceAvatars } from "./presence-avatars";
 import type {
   CanvasNode as CanvasNodeType,
   CanvasEdge,
@@ -32,6 +34,7 @@ import type {
 import type { EdgeChange } from "@xyflow/react";
 import { DEFAULT_NODE_COLOR } from "@/types/canvas";
 import type { CanvasTemplate } from "@/components/editor/starter-templates";
+import { useCanvasAutosave, type SaveStatus } from "@/hooks/use-canvas-autosave";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   canvasNode: CanvasNode as unknown as ComponentType<NodeProps>,
@@ -113,14 +116,57 @@ function TemplateImporter({
   return null;
 }
 
+function CanvasStateLoader({ projectId }: { projectId: string }) {
+  const { fitView, getNodes, getEdges } = useReactFlow();
+  const { onNodesChange, onEdgesChange } = useCanvas();
+  const loadAttempted = useRef(false);
+
+  useEffect(() => {
+    if (loadAttempted.current) return;
+    loadAttempted.current = true;
+
+    const existingNodes = getNodes();
+    const existingEdges = getEdges();
+    if (existingNodes.length > 0 || existingEdges.length > 0) return;
+
+    fetch(`/api/projects/${projectId}/canvas`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const addNodes = (data.nodes ?? []).map((nd: CanvasNodeType) => ({
+          type: "add" as const,
+          item: nd,
+        }));
+        const addEdges = (data.edges ?? []).map((eg: CanvasEdge) => ({
+          type: "add" as const,
+          item: eg,
+        }));
+        if (addNodes.length) onNodesChange(addNodes);
+        if (addEdges.length) onEdgesChange(addEdges as EdgeChange<CanvasEdge>[]);
+        if (addNodes.length || addEdges.length) {
+          setTimeout(() => fitView({ padding: 0.15, duration: 500 }), 100);
+        }
+      })
+      .catch(() => {});
+  }, [projectId, fitView, getNodes, getEdges, onNodesChange, onEdgesChange]);
+
+  return null;
+}
+
 interface CanvasProps {
+  projectId: string;
   templateToImport?: CanvasTemplate | null;
   onTemplateImported?: () => void;
+  onSaveStatusChange?: (status: SaveStatus) => void;
+  onSaveReady?: (saveFn: () => void) => void;
 }
 
 export function Canvas({
+  projectId,
   templateToImport = null,
   onTemplateImported = () => {},
+  onSaveStatusChange,
+  onSaveReady,
 }: CanvasProps) {
   const screenToFlowPositionRef = useRef<
     ((point: { x: number; y: number }) => { x: number; y: number }) | null
@@ -130,6 +176,11 @@ export function Canvas({
   const redo = useRedo();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
+  const updateMyPresence = useUpdateMyPresence();
+
+  const handleMouseLeave = useCallback(() => {
+    updateMyPresence({ cursor: null });
+  }, [updateMyPresence]);
 
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onDelete } =
     useLiveblocksFlow<CanvasNodeType>({
@@ -144,6 +195,31 @@ export function Canvas({
     },
     [onEdgesChange],
   );
+
+  const { status: saveStatus, save } = useCanvasAutosave(
+    projectId,
+    nodes as CanvasNodeType[],
+    edges as CanvasEdge[],
+  );
+
+  useEffect(() => {
+    onSaveStatusChange?.(saveStatus);
+  }, [saveStatus, onSaveStatusChange]);
+
+  useEffect(() => {
+    onSaveReady?.(save);
+  }, [save, onSaveReady]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        save();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [save]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     if (e.dataTransfer.types.includes("application/ghost-shape")) {
@@ -221,12 +297,14 @@ export function Canvas({
           proOptions={{ hideAttribution: true }}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
+          onMouseLeave={handleMouseLeave}
         >
           <FlowPositionCapture
             capture={(fn) => {
               screenToFlowPositionRef.current = fn;
             }}
           />
+          <CanvasStateLoader projectId={projectId} />
           <TemplateImporter
             templateToImport={templateToImport}
             onTemplateImported={onTemplateImported}
@@ -239,7 +317,10 @@ export function Canvas({
               canRedo={canRedo}
             />
           </Panel>
-          <Cursors />
+          <Cursors components={{ Cursor: CanvasCursor }} />
+          <Panel position="top-right">
+            <PresenceAvatars />
+          </Panel>
           <MiniMap
             nodeColor={(node) =>
               (node.data as { color?: string }).color ?? "#2a2a38"

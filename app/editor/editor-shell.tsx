@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { EditorNavbar } from "@/components/editor/editor-navbar"
 import { ProjectSidebar } from "@/components/editor/project-sidebar"
 import { CreateProjectDialog } from "@/components/editor/dialogs/create-project-dialog"
@@ -18,6 +19,15 @@ interface EditorShellProps {
 
 export function EditorShell({ ownedProjects, sharedProjects }: EditorShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const router = useRouter()
+
+  const onNavigate = useCallback(
+    (roomId: string) => {
+      router.push(`/editor/${roomId}`)
+      setSidebarOpen(false)
+    },
+    [router],
+  )
 
   const {
     dialog,
@@ -50,6 +60,7 @@ export function EditorShell({ ownedProjects, sharedProjects }: EditorShellProps)
         onNewProject={openCreate}
         onRenameProject={openRename}
         onDeleteProject={openDelete}
+        onNavigate={onNavigate}
       />
 
       <main className="flex-1 overflow-hidden relative flex flex-col items-center justify-center p-6 bg-cosmic">
