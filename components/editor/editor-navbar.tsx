@@ -5,6 +5,7 @@ import {
   PanelLeftClose,
   Share2,
   BrainCircuit,
+  LayoutTemplate,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ interface EditorNavbarProps {
   onShare?: () => void;
   isAIOpen?: boolean;
   onToggleAI?: () => void;
+  onOpenTemplates?: () => void;
 }
 
 export function EditorNavbar({
@@ -27,6 +29,7 @@ export function EditorNavbar({
   onShare,
   isAIOpen,
   onToggleAI,
+  onOpenTemplates,
 }: EditorNavbarProps) {
   return (
     <header className="relative h-14 flex items-center px-4 glass-panel-deep border-b border-surface-border shrink-0 z-50">
@@ -67,6 +70,17 @@ export function EditorNavbar({
       <div className="flex-1" />
 
       <div className="flex items-center gap-2">
+        {onOpenTemplates && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOpenTemplates}
+            className="h-8 gap-1.5 text-copy-muted hover:text-copy-primary text-xs font-medium"
+          >
+            <LayoutTemplate className="h-3.5 w-3.5" />
+            Templates
+          </Button>
+        )}
         {onShare && (
           <Button
             variant="ghost"

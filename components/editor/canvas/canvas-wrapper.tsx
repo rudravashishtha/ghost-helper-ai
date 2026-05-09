@@ -3,12 +3,15 @@
 import { LiveblocksProvider, RoomProvider, ClientSideSuspense } from "@liveblocks/react/suspense";
 import { ErrorBoundary } from "react-error-boundary";
 import { Canvas } from "./canvas";
+import type { CanvasTemplate } from "@/components/editor/starter-templates";
 
 interface CanvasWrapperProps {
   roomId: string;
+  templateToImport?: CanvasTemplate | null;
+  onTemplateImported?: () => void;
 }
 
-export function CanvasWrapper({ roomId }: CanvasWrapperProps) {
+export function CanvasWrapper({ roomId, templateToImport, onTemplateImported }: CanvasWrapperProps) {
   return (
     <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
       <RoomProvider id={roomId} initialPresence={{ cursor: null, isThinking: false }}>
@@ -22,7 +25,10 @@ export function CanvasWrapper({ roomId }: CanvasWrapperProps) {
               Connecting…
             </div>
           }>
-            <Canvas />
+            <Canvas
+              templateToImport={templateToImport}
+              onTemplateImported={onTemplateImported}
+            />
           </ClientSideSuspense>
         </ErrorBoundary>
       </RoomProvider>
