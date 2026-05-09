@@ -5,20 +5,20 @@ import { PrismaPg } from "@prisma/adapter-pg"
 
 const url = process.env.DATABASE_URL ?? ""
 
-function makePrismaClient() {
+function makePrismaClient(): PrismaClient {
   if (url.startsWith("prisma+postgres://") || url.startsWith("prisma://")) {
-    return new PrismaClient({ accelerateUrl: url }).$extends(withAccelerate())
+    return new PrismaClient({ accelerateUrl: url }).$extends(withAccelerate()) as unknown as PrismaClient
   }
 
-  const adapter = new PrismaPg(new Pool({ connectionString: url }))
+  const adapter = new PrismaPg(new Pool({ connectionString: url, ssl: { rejectUnauthorized: true } }))
   return new PrismaClient({ adapter })
 }
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof makePrismaClient> | undefined
+  prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? makePrismaClient()
+export const prisma: PrismaClient = globalForPrisma.prisma ?? makePrismaClient()
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma

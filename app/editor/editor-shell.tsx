@@ -8,18 +8,24 @@ import { CreateProjectDialog } from "@/components/editor/dialogs/create-project-
 import { RenameProjectDialog } from "@/components/editor/dialogs/rename-project-dialog"
 import { DeleteProjectDialog } from "@/components/editor/dialogs/delete-project-dialog"
 import { Button } from "@/components/ui/button"
-import { useProjectDialogs } from "@/hooks/use-project-dialogs"
+import { useProjectActions } from "@/hooks/use-project-actions"
+import type { Project } from "@/lib/types"
 
-export function EditorShell() {
+interface EditorShellProps {
+  ownedProjects: Project[]
+  sharedProjects: Project[]
+}
+
+export function EditorShell({ ownedProjects, sharedProjects }: EditorShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const {
-    projects,
     dialog,
     activeProject,
     formName,
     setFormName,
     loading,
+    previewRoomId,
     openCreate,
     openRename,
     openDelete,
@@ -27,7 +33,7 @@ export function EditorShell() {
     handleCreate,
     handleRename,
     handleDelete,
-  } = useProjectDialogs()
+  } = useProjectActions()
 
   return (
     <div className="flex flex-col h-screen bg-base">
@@ -39,7 +45,8 @@ export function EditorShell() {
       <ProjectSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        projects={projects}
+        ownedProjects={ownedProjects}
+        sharedProjects={sharedProjects}
         onNewProject={openCreate}
         onRenameProject={openRename}
         onDeleteProject={openDelete}
@@ -69,6 +76,7 @@ export function EditorShell() {
         onNameChange={setFormName}
         onCreate={handleCreate}
         loading={loading}
+        previewRoomId={previewRoomId}
       />
 
       <RenameProjectDialog

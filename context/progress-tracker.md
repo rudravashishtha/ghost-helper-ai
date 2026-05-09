@@ -4,7 +4,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Feature 05: Prisma Schema & Data Layer — complete
+- Feature 07: Wire Editor Home — complete
 
 ## Completed
 
@@ -13,6 +13,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 03: Auth — @clerk/ui installed, proxy.ts at root (Next.js 16 Node.js middleware), ClerkProvider wraps root layout with dark theme + CSS variable overrides, /sign-in and /sign-up two-panel pages, app/page.tsx redirects authenticated→/editor unauthenticated→/sign-in, UserButton added to editor navbar right section, app/editor/page.tsx + editor-shell.tsx created.
 - Feature 04: Project Dialogs & Editor Home — hooks/use-project-dialogs.ts (dialog/form/loading state, mock project data, slug generation), editor home screen (heading + description + New Project button), Create/Rename/Delete dialogs in components/editor/dialogs/, sidebar updated with project items + owned-only rename/delete actions + mobile backdrop scrim, all wired through editor-shell.tsx.
 - Feature 05: Prisma Schema & Data Layer — prisma/models/project.prisma (Project + ProjectCollaborator models with indexes and cascade delete), lib/prisma.ts (singleton, pg-adapter for postgres:// URLs, accelerateUrl for prisma+postgres:// URLs), migration applied to Prisma Postgres at db.prisma.io, client generated to app/generated/prisma/. Packages added: prisma, @prisma/client, @prisma/adapter-pg, pg, @prisma/extension-accelerate, dotenv.
+- Feature 06: Project APIs — app/api/projects/route.ts (GET list, POST create with "Untitled Project" default), app/api/projects/[projectId]/route.ts (PATCH rename, DELETE — both enforce owner-only with 403 for non-owners), 401 on all unauthenticated requests. lib/prisma.ts typed as PrismaClient to resolve Accelerate union overload error.
+- Feature 07: Wire Editor Home — lib/projects.ts (getOwnedProjects, getSharedProjects server helpers), lib/types.ts (shared Project interface for client components), hooks/use-project-actions.ts (create with slug+suffix roomId → POST → navigate; rename PATCH + refresh; delete DELETE + redirect/refresh; create dialog preview shows the actual generated suffix before submit), app/editor/page.tsx converted to async server component fetching real data via Clerk auth, editor-shell.tsx accepts project lists as props, project-sidebar.tsx split into ownedProjects/sharedProjects props, all dialogs use real Project type, create dialog shows room ID preview. POST /api/projects now accepts optional id for aligned project+Liveblocks room ID.
 
 ## In Progress
 
@@ -20,7 +22,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Feature 06 (TBD).
+- Feature 08 (TBD).
 
 ## Open Questions
 

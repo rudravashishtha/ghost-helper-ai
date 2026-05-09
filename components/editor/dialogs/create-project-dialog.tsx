@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { nameToSlug } from "@/hooks/use-project-dialogs";
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -20,6 +19,7 @@ interface CreateProjectDialogProps {
   onNameChange: (value: string) => void;
   onCreate: () => void;
   loading?: boolean;
+  previewRoomId?: string;
 }
 
 export function CreateProjectDialog({
@@ -29,9 +29,8 @@ export function CreateProjectDialog({
   onNameChange,
   onCreate,
   loading,
+  previewRoomId,
 }: CreateProjectDialogProps) {
-  const slug = nameToSlug(name);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
@@ -55,7 +54,12 @@ export function CreateProjectDialog({
             autoFocus
           />
           <p className="font-mono text-xs text-copy-muted">
-            slug: {slug ? slug : <span className="text-copy-faint">—</span>}
+            room:{" "}
+            {previewRoomId ? (
+              previewRoomId
+            ) : (
+              <span className="text-copy-faint">—</span>
+            )}
           </p>
         </div>
 
