@@ -231,7 +231,7 @@ export function StarterTemplatesModal({
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-surface-border">
           <div className="flex items-center gap-2">
             <LayoutTemplate className="h-4 w-4 text-brand" />
-            <DialogTitle className="text-base font-semibold text-copy-primary">
+            <DialogTitle className="font-semibold text-copy-primary">
               Starter Templates
             </DialogTitle>
           </div>
