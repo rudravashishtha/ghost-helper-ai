@@ -103,10 +103,14 @@ export function ProjectSidebar({
         aria-hidden={isOpen ? undefined : true}
         inert={isOpen ? undefined : true}
         className={[
-          "fixed top-14 left-0 z-40 h-[calc(100vh-3.5rem)] w-72 flex flex-col",
-          "glass-panel-deep border-r border-surface-border shadow-2xl",
-          "transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          "fixed z-40 flex flex-col",
+          "top-16 left-2 h-[calc(100vh-3.5rem-16px)] w-72",
+          "bg-elevated/95 backdrop-blur-2xl",
+          "border border-surface-border/60 rounded-2xl overflow-hidden",
+          "transition-all duration-300 ease-in-out",
+          isOpen
+            ? "translate-x-0 shadow-[0_8px_40px_-4px_rgba(0,0,0,0.8),0_2px_12px_-2px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.04)]"
+            : "-translate-x-[calc(100%+0.5rem)] shadow-none",
         ].join(" ")}
       >
         <div className="flex items-center justify-between px-4 h-14 border-b border-surface-border shrink-0">
