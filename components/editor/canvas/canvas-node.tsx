@@ -187,11 +187,12 @@ function renderShape(
   textColor: string,
   label: string | null,
 ) {
-  const text = label === null ? null : label ? (
-    <span style={{ color: textColor }}>{label}</span>
-  ) : (
-    <span style={{ color: textColor, opacity: 0.3 }}>Label...</span>
-  );
+  const text =
+    label === null ? null : label ? (
+      <span style={{ color: textColor }}>{label}</span>
+    ) : (
+      <span style={{ color: textColor, opacity: 0.3 }}>Label...</span>
+    );
 
   switch (shape) {
     case "rectangle":
@@ -345,19 +346,16 @@ function CanvasNodeComponent({ id, data, selected }: CanvasNodeProps) {
     setEditing(false);
   }, [id, getNode, onNodesChange]);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLDivElement>) => {
-      e.stopPropagation();
-      if (e.key === "Escape") {
-        setEditing(false);
-      }
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        commitEdit();
-      }
-    },
-    [commitEdit],
-  );
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (e.key === "Escape") {
+      setEditing(false);
+    }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      e.currentTarget.blur();
+    }
+  }, []);
 
   const fill = data.color ?? "#1F1F1F";
   const textColor = data.textColor ?? "#EDEDED";
@@ -372,7 +370,10 @@ function CanvasNodeComponent({ id, data, selected }: CanvasNodeProps) {
         {
           id,
           type: "replace",
-          item: { ...node, data: { ...node.data, color: newFill, textColor: newText } },
+          item: {
+            ...node,
+            data: { ...node.data, color: newFill, textColor: newText },
+          },
         },
       ]);
     },
@@ -405,7 +406,13 @@ function CanvasNodeComponent({ id, data, selected }: CanvasNodeProps) {
             onColorSelect={handleColorSelect}
           />
         )}
-        {renderShape(shape, fill, stroke, textColor, editing ? null : data.label)}
+        {renderShape(
+          shape,
+          fill,
+          stroke,
+          textColor,
+          editing ? null : data.label,
+        )}
         {editing && (
           <div
             ref={editDivRef}

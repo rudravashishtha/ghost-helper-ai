@@ -12,6 +12,7 @@ import {
   type NodeChange,
   type NodeProps,
   type EdgeTypes,
+  type OnEdgesChange,
 } from "@xyflow/react";
 import { useLiveblocksFlow, Cursors } from "@liveblocks/react-flow";
 import { useUndo, useRedo, useCanUndo, useCanRedo } from "@liveblocks/react";
@@ -77,12 +78,24 @@ function TemplateImporter({
   useEffect(() => {
     if (!templateToImport) return;
 
-    const removeNodes = getNodes().map((nd) => ({ type: "remove" as const, id: nd.id }));
-    const addNodes = templateToImport.nodes.map((nd) => ({ type: "add" as const, item: nd as CanvasNodeType }));
+    const removeNodes = getNodes().map((nd) => ({
+      type: "remove" as const,
+      id: nd.id,
+    }));
+    const addNodes = templateToImport.nodes.map((nd) => ({
+      type: "add" as const,
+      item: nd as CanvasNodeType,
+    }));
     onNodesChange([...removeNodes, ...addNodes]);
 
-    const removeEdges = getEdges().map((eg) => ({ type: "remove" as const, id: eg.id }));
-    const addEdges = templateToImport.edges.map((eg) => ({ type: "add" as const, item: eg as CanvasEdge }));
+    const removeEdges = getEdges().map((eg) => ({
+      type: "remove" as const,
+      id: eg.id,
+    }));
+    const addEdges = templateToImport.edges.map((eg) => ({
+      type: "add" as const,
+      item: eg as CanvasEdge,
+    }));
     onEdgesChange([...removeEdges, ...addEdges] as EdgeChange<CanvasEdge>[]);
 
     onTemplateImported();
@@ -105,7 +118,10 @@ interface CanvasProps {
   onTemplateImported?: () => void;
 }
 
-export function Canvas({ templateToImport = null, onTemplateImported = () => {} }: CanvasProps) {
+export function Canvas({
+  templateToImport = null,
+  onTemplateImported = () => {},
+}: CanvasProps) {
   const screenToFlowPositionRef = useRef<
     ((point: { x: number; y: number }) => { x: number; y: number }) | null
   >(null);
@@ -123,10 +139,8 @@ export function Canvas({ templateToImport = null, onTemplateImported = () => {} 
     });
 
   const onEdgesChangeTyped = useCallback(
-    (changes: EdgeChange<CanvasEdge>[]) => {
-      // useLiveblocksFlow's onEdgesChange has a discriminated union mismatch with xyflow's EdgeChange
-      // when using custom Edge types, so we cast to any here to bridge the gap.
-      return onEdgesChange(changes as any);
+    (changes: EdgeChange[]) => {
+      return (onEdgesChange as OnEdgesChange)(changes);
     },
     [onEdgesChange],
   );
@@ -227,9 +241,11 @@ export function Canvas({ templateToImport = null, onTemplateImported = () => {} 
           </Panel>
           <Cursors />
           <MiniMap
-            nodeColor="#2a2a38"
+            nodeColor={(node) =>
+              (node.data as { color?: string }).color ?? "#2a2a38"
+            }
             nodeStrokeColor="#3a3a50"
-            maskColor="rgba(8,8,14,0.7)"
+            maskColor="rgba(8,8,9,0.7)"
           />
           <Background variant={BackgroundVariant.Dots} gap={28} size={1.5} />
         </ReactFlow>

@@ -8,7 +8,10 @@ import {
   useReactFlow,
   type EdgeProps,
 } from "@xyflow/react";
-import type { CanvasEdge as CanvasEdgeType, CanvasEdgeData } from "@/types/canvas";
+import type {
+  CanvasEdge as CanvasEdgeType,
+  CanvasEdgeData,
+} from "@/types/canvas";
 import { useCanvas } from "./canvas-context";
 
 type CanvasEdgeProps = EdgeProps<CanvasEdgeType>;
@@ -98,13 +101,13 @@ function CanvasEdgeComponent({
       e.stopPropagation();
       if (e.key === "Enter") {
         e.preventDefault();
-        commitEdit();
+        e.currentTarget.blur();
       }
       if (e.key === "Escape") {
         setEditing(false);
       }
     },
-    [commitEdit],
+    [],
   );
 
   return (
@@ -126,13 +129,19 @@ function CanvasEdgeComponent({
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeOpacity={strokeOpacity}
-        style={{ transition: "stroke 0.15s ease, stroke-opacity 0.15s ease", pointerEvents: "none" }}
+        style={{
+          transition: "stroke 0.15s ease, stroke-opacity 0.15s ease",
+          pointerEvents: "none",
+        }}
       />
       <polygon
         points={arrowPoints(targetX, targetY, targetPosition)}
         fill={strokeColor}
         fillOpacity={strokeOpacity}
-        style={{ transition: "fill 0.15s ease, fill-opacity 0.15s ease", pointerEvents: "none" }}
+        style={{
+          transition: "fill 0.15s ease, fill-opacity 0.15s ease",
+          pointerEvents: "none",
+        }}
       />
       <EdgeLabelRenderer>
         <div

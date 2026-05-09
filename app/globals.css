@@ -152,19 +152,20 @@
 .react-flow__minimap {
     border-radius: 8px;
     border: 1px solid var(--border-default);
-    background: #12121a;
+    background: var(--bg-base);
     overflow: hidden;
 }
 .react-flow__minimap-svg {
-    background: #12121a;
+    background: var(--bg-base);
 }
 .react-flow__minimap-node {
     fill: #2a2a38;
     stroke: #3a3a50;
     stroke-width: 1px;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.08));
 }
 .react-flow__minimap-mask {
-    fill: rgba(8, 8, 14, 0.7);
+    fill: rgba(8, 8, 9, 0.7);
 }
 
 /* Handles: transparent by default so they don't cut through shape strokes */
