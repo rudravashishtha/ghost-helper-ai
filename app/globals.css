@@ -136,6 +136,24 @@
     }
 }
 
+/* Strip ReactFlow card/border defaults so canvas feels infinite */
+.react-flow {
+    background: var(--bg-base);
+    --xy-background-pattern-dots-color-default: #2e2e3a;
+    --xy-background-color-default: var(--bg-base);
+}
+.react-flow__renderer {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+.react-flow__minimap {
+    border-radius: 8px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    overflow: hidden;
+}
+
 @layer components {
     /* Dialog pattern — reusable shell for product dialogs */
     .dialog-overlay {
