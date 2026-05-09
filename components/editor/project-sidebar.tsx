@@ -3,31 +3,33 @@
 import { X, Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import type { MockProject } from "@/hooks/use-project-dialogs";
+import type { Project } from "@/lib/types";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  projects: MockProject[];
+  ownedProjects: Project[];
+  sharedProjects: Project[];
   onNewProject: () => void;
-  onRenameProject: (project: MockProject) => void;
-  onDeleteProject: (project: MockProject) => void;
+  onRenameProject: (project: Project) => void;
+  onDeleteProject: (project: Project) => void;
   sidebarId?: string;
 }
 
 interface ProjectItemProps {
-  project: MockProject;
-  onRename: (project: MockProject) => void;
-  onDelete: (project: MockProject) => void;
+  project: Project;
+  isOwned: boolean;
+  onRename: (project: Project) => void;
+  onDelete: (project: Project) => void;
 }
 
-function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
+function ProjectItem({ project, isOwned, onRename, onDelete }: ProjectItemProps) {
   return (
     <div className="group flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-elevated">
       <span className="flex-1 truncate text-sm text-copy-primary">
         {project.name}
       </span>
-      {project.isOwned && (
+      {isOwned && (
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             variant="ghost"
@@ -62,15 +64,13 @@ function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
 export function ProjectSidebar({
   isOpen,
   onClose,
-  projects,
+  ownedProjects,
+  sharedProjects,
   onNewProject,
   onRenameProject,
   onDeleteProject,
   sidebarId = "project-sidebar",
 }: ProjectSidebarProps) {
-  const ownedProjects = projects.filter((p) => p.isOwned);
-  const sharedProjects = projects.filter((p) => !p.isOwned);
-
   return (
     <>
       {isOpen && (
@@ -129,6 +129,7 @@ export function ProjectSidebar({
                     <ProjectItem
                       key={project.id}
                       project={project}
+                      isOwned
                       onRename={onRenameProject}
                       onDelete={onDeleteProject}
                     />
@@ -148,6 +149,7 @@ export function ProjectSidebar({
                     <ProjectItem
                       key={project.id}
                       project={project}
+                      isOwned={false}
                       onRename={onRenameProject}
                       onDelete={onDeleteProject}
                     />

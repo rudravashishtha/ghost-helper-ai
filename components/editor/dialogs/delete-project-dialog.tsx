@@ -10,12 +10,12 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import type { MockProject } from "@/hooks/use-project-dialogs"
+import type { Project } from "@/lib/types"
 
 interface DeleteProjectDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  project: MockProject | null
+  project: Project | null
   onDelete: () => void
   loading?: boolean
 }
