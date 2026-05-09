@@ -99,6 +99,7 @@ interface ShareDialogProps {
   projectId: string;
   projectName: string;
   isOwner: boolean;
+  loadErrorMessage?: string | null;
 }
 
 export interface ShareDialogHandle {
@@ -107,7 +108,14 @@ export interface ShareDialogHandle {
 
 export const ShareDialog = forwardRef<ShareDialogHandle, ShareDialogProps>(
   function ShareDialog(
-    { open, onOpenChange, projectId, projectName, isOwner }: ShareDialogProps,
+    {
+      open,
+      onOpenChange,
+      projectId,
+      projectName,
+      isOwner,
+      loadErrorMessage,
+    }: ShareDialogProps,
     ref,
   ) {
     const [owner, setOwner] = useState<Person | null>(null);
@@ -124,6 +132,7 @@ export const ShareDialog = forwardRef<ShareDialogHandle, ShareDialogProps>(
     const [inviteError, setInviteError] = useState<string | null>(null);
     const [removingEmail, setRemovingEmail] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    const [copyError, setCopyError] = useState<string | null>(null);
 
     const fetchCollaborators = useCallback(
       async (cursor?: string, query?: string) => {
@@ -232,12 +241,17 @@ export const ShareDialog = forwardRef<ShareDialogHandle, ShareDialogProps>(
       }
     }
 
-    function handleCopyLink() {
+    async function handleCopyLink() {
       const url = `${window.location.origin}/editor/${projectId}`;
-      navigator.clipboard.writeText(url).then(() => {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopyError(null);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      });
+      } catch (error) {
+        console.error("Failed to copy share link", { error, projectId });
+        setCopyError("Failed to copy link");
+      }
     }
 
     return (
@@ -254,6 +268,7 @@ export const ShareDialog = forwardRef<ShareDialogHandle, ShareDialogProps>(
               variant="ghost"
               size="icon"
               onClick={() => onOpenChange(false)}
+              aria-label="Close"
               className="h-8 w-8 rounded-lg text-copy-muted hover:text-copy-primary hover:bg-elevated"
             >
               <X className="h-4 w-4" />
@@ -274,7 +289,7 @@ export const ShareDialog = forwardRef<ShareDialogHandle, ShareDialogProps>(
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleCopyLink}
+                  onClick={() => void handleCopyLink()}
                   className="h-10 w-10 shrink-0 text-copy-muted hover:text-copy-primary hover:bg-elevated border border-surface-border rounded-xl"
                   aria-label="Copy link"
                 >
@@ -285,6 +300,11 @@ export const ShareDialog = forwardRef<ShareDialogHandle, ShareDialogProps>(
                   )}
                 </Button>
               </div>
+              {(copyError || loadErrorMessage) && (
+                <p className="text-xs text-error">
+                  {copyError ?? loadErrorMessage}
+                </p>
+              )}
 
               {isOwner && (
                 <div className="flex flex-col gap-3">

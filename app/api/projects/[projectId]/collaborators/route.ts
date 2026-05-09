@@ -7,6 +7,15 @@ interface RouteContext {
   params: Promise<{ projectId: string }>;
 }
 
+function parseLimit(value: string | null): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
+    return 25;
+  }
+
+  return Math.min(parsed, 100);
+}
+
 async function resolveAccess(
   projectId: string,
   userId: string,
@@ -35,8 +44,9 @@ export async function GET(request: Request, { params }: RouteContext) {
     clerkUser?.primaryEmailAddress?.emailAddress ??
     clerkUser?.emailAddresses[0]?.emailAddress ??
     "";
+  const normalizedEmail = userEmail.trim().toLowerCase();
 
-  const access = await resolveAccess(projectId, userId, userEmail);
+  const access = await resolveAccess(projectId, userId, normalizedEmail);
   if ("error" in access)
     return NextResponse.json(
       { error: access.error },
@@ -45,7 +55,7 @@ export async function GET(request: Request, { params }: RouteContext) {
 
   const { searchParams } = new URL(request.url);
   const cursor = searchParams.get("cursor");
-  const limit = Math.min(parseInt(searchParams.get("limit") || "25"), 100);
+  const limit = parseLimit(searchParams.get("limit"));
   const query = searchParams.get("query")?.trim().toLowerCase();
 
   const where: Prisma.ProjectCollaboratorWhereInput = {
@@ -102,8 +112,16 @@ export async function GET(request: Request, { params }: RouteContext) {
     ReturnType<typeof client.users.getUserList>
   >["data"] = [];
   if (emails.length) {
-    clerkUsers = (await client.users.getUserList({ emailAddress: emails }))
-      .data;
+    try {
+      clerkUsers = (await client.users.getUserList({ emailAddress: emails }))
+        .data;
+    } catch (error) {
+      console.error("Failed to enrich collaborator data from Clerk", {
+        error,
+        projectId,
+        emails,
+      });
+    }
   }
 
   const enriched = pageItems.map((c) => {

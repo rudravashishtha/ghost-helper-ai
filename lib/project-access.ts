@@ -16,7 +16,7 @@ export async function getCurrentIdentity(): Promise<{
 export async function getProjectWithAccess(
   projectId: string,
   userId: string,
-  email: string
+  email?: string
 ): Promise<Project | null> {
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) return null;
@@ -24,8 +24,9 @@ export async function getProjectWithAccess(
   if (project.ownerId === userId) return project;
 
   if (email) {
+    const normalizedEmail = email.trim().toLowerCase();
     const collab = await prisma.projectCollaborator.findFirst({
-      where: { projectId, email },
+      where: { projectId, email: normalizedEmail },
     });
     if (collab) return project;
   }

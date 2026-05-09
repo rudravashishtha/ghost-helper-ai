@@ -55,7 +55,10 @@ export function EditorNavbar({
           </span>
         ) : (
           <span className="text-sm font-medium text-copy-primary tracking-tight flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-brand glow-celestial" />
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-brand glow-celestial"
+              aria-hidden="true"
+            />
             Ghost AI
           </span>
         )}

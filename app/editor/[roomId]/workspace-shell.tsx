@@ -32,6 +32,7 @@ export function WorkspaceShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [shareLoadError, setShareLoadError] = useState<string | null>(null);
 
   const {
     dialog,
@@ -51,9 +52,10 @@ export function WorkspaceShell({
 
   function handleShareOpen() {
     setShareOpen(true);
+    setShareLoadError(null);
     shareDialogRef.current?.loadCollaborators().catch((error) => {
-      console.error('Failed to load collaborators:', error);
-      // Optionally show a toast notification to the user
+      console.error("Failed to load collaborators", { error });
+      setShareLoadError("Failed to load collaborators");
     });
   }
 
@@ -125,6 +127,7 @@ export function WorkspaceShell({
         projectId={project.id}
         projectName={project.name}
         isOwner={isOwner}
+        loadErrorMessage={shareLoadError}
       />
 
       <CreateProjectDialog
