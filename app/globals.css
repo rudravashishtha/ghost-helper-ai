@@ -67,6 +67,8 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    --z-index-60: 60;
 }
 
 :root {
@@ -150,8 +152,32 @@
 .react-flow__minimap {
     border-radius: 8px;
     border: 1px solid var(--border-default);
-    background: var(--bg-surface);
+    background: #12121a;
     overflow: hidden;
+}
+.react-flow__minimap-svg {
+    background: #12121a;
+}
+.react-flow__minimap-node {
+    fill: #2a2a38;
+    stroke: #3a3a50;
+    stroke-width: 1px;
+}
+.react-flow__minimap-mask {
+    fill: rgba(8, 8, 14, 0.7);
+}
+
+/* Handles: transparent by default so they don't cut through shape strokes */
+.react-flow__handle {
+    background: transparent;
+    border: 2px solid #3a3a50;
+    width: 10px;
+    height: 10px;
+}
+.react-flow__handle:hover,
+.react-flow__handle.react-flow__handle-connecting {
+    background: #00c8d4;
+    border-color: #00c8d4;
 }
 
 @layer components {
@@ -165,7 +191,8 @@
     }
 
     .dialog-title {
-        @apply text-base font-semibold text-copy-primary;
+        @apply text-base font-semibold;
+        color: var(--color-copy-primary);
     }
 
     .dialog-description {

@@ -13,6 +13,8 @@ import { RenameProjectDialog } from "@/components/editor/dialogs/rename-project-
 import { DeleteProjectDialog } from "@/components/editor/dialogs/delete-project-dialog";
 import { useProjectActions } from "@/hooks/use-project-actions";
 import { CanvasWrapper } from "@/components/editor/canvas/canvas-wrapper";
+import { StarterTemplatesModal } from "@/components/editor/starter-templates-modal";
+import type { CanvasTemplate } from "@/components/editor/starter-templates";
 import type { Project } from "@/lib/types";
 
 interface WorkspaceShellProps {
@@ -33,6 +35,8 @@ export function WorkspaceShell({
   const [aiOpen, setAiOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareLoadError, setShareLoadError] = useState<string | null>(null);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [templateToImport, setTemplateToImport] = useState<CanvasTemplate | null>(null);
 
   const {
     dialog,
@@ -65,6 +69,7 @@ export function WorkspaceShell({
         isSidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         projectName={project.name}
+        onOpenTemplates={() => setTemplatesOpen(true)}
         onShare={handleShareOpen}
         isAIOpen={aiOpen}
         onToggleAI={() => setAiOpen((v) => !v)}
@@ -83,7 +88,11 @@ export function WorkspaceShell({
         />
 
         <main className="flex-1 overflow-hidden relative bg-base">
-          <CanvasWrapper roomId={project.id} />
+          <CanvasWrapper
+            roomId={project.id}
+            templateToImport={templateToImport}
+            onTemplateImported={() => setTemplateToImport(null)}
+          />
         </main>
       </div>
 
@@ -119,6 +128,12 @@ export function WorkspaceShell({
           </div>
         </aside>
       )}
+
+      <StarterTemplatesModal
+        open={templatesOpen}
+        onOpenChange={setTemplatesOpen}
+        onImport={setTemplateToImport}
+      />
 
       <ShareDialog
         ref={shareDialogRef}
