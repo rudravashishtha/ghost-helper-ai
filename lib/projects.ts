@@ -5,7 +5,7 @@ export async function getOwnedProjects(userId: string): Promise<Project[]> {
   return prisma.project.findMany({
     where: { ownerId: userId },
     orderBy: { createdAt: "desc" },
-  }) as Promise<Project[]>;
+  });
 }
 
 export async function getSharedProjects(userEmail: string): Promise<Project[]> {
@@ -14,5 +14,5 @@ export async function getSharedProjects(userEmail: string): Promise<Project[]> {
     include: { project: true },
     orderBy: { createdAt: "desc" },
   });
-  return collaborations.map((c) => c.project) as Project[];
+  return collaborations.map((c) => c.project);
 }
