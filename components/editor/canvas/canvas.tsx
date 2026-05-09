@@ -87,8 +87,15 @@ function TemplateImporter({
 
     onTemplateImported();
     setTimeout(() => fitView({ padding: 0.15, duration: 500 }), 100);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateToImport]);
+  }, [
+    templateToImport,
+    onTemplateImported,
+    onNodesChange,
+    onEdgesChange,
+    getNodes,
+    getEdges,
+    fitView,
+  ]);
 
   return null;
 }
@@ -114,6 +121,15 @@ export function Canvas({ templateToImport = null, onTemplateImported = () => {} 
       nodes: { initial: [] },
       edges: { initial: [] },
     });
+
+  const onEdgesChangeTyped = useCallback(
+    (changes: EdgeChange<CanvasEdge>[]) => {
+      // useLiveblocksFlow's onEdgesChange has a discriminated union mismatch with xyflow's EdgeChange
+      // when using custom Edge types, so we cast to any here to bridge the gap.
+      return onEdgesChange(changes as any);
+    },
+    [onEdgesChange],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     if (e.dataTransfer.types.includes("application/ghost-shape")) {
@@ -172,16 +188,14 @@ export function Canvas({ templateToImport = null, onTemplateImported = () => {} 
       <CanvasContext.Provider
         value={{
           onNodesChange,
-          onEdgesChange: onEdgesChange as unknown as (
-            changes: EdgeChange<CanvasEdge>[],
-          ) => void,
+          onEdgesChange: onEdgesChangeTyped,
         }}
       >
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
+          onEdgesChange={onEdgesChangeTyped}
           onConnect={onConnect}
           onDelete={onDelete}
           nodeTypes={nodeTypes}
